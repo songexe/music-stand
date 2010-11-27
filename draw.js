@@ -177,6 +177,7 @@ $(document).ready(function () {
             var X = getX();
             var Y = getY();
             var Drag = getDrag();
+            var Erase = getErase();
 
             for (var i = 0; i < X.length; i++) {
                 if (Erase[i]) {
@@ -265,12 +266,10 @@ $(document).ready(function () {
 
     // Ghetto WOZ handlers
     $(document).keypress(function(e) {
-        alert("!");
         if (e.keyCode == 13) {
             toggleEditMode();
-        } else if (e.keyCode == 69) {
+        } else if (e.keyCode == 101) {
             erase = !erase;
-            alert(erase);
         }
     });
 });
