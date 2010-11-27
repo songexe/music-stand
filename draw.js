@@ -9,21 +9,22 @@ $(document).ready(function () {
     bg.width = WIDTH; 
     bg.height = HEIGHT; 
 
-    var personal = document.getElementById('personal');
-    personal.width = WIDTH - 11; 
-    personal.height = HEIGHT - 11; 
-    var pctx = personal.getContext('2d');
-    pctx.strokeStyle = '#0000ff';
-    pctx.lineJoin = 'round';
-    pctx.lineWidth = STROKE_SIZE;
+    function getButtonCanvas(canvasID, strokeStyle) {
+	result = document.getElementById(canvasID);
+	result.width = WIDTH - 11; 
+	result.height = HEIGHT - 11; 
+	var ctx = result.getContext('2d');
+	ctx.strokeStyle = strokeStyle;
+	ctx.lineJoin = 'round';
+	ctx.lineWidth = STROKE_SIZE;
 
-    var group = document.getElementById('group');
-    group.width = WIDTH - 11;
-    group.height = HEIGHT - 11;
-    var gctx = group.getContext('2d');
-    gctx.strokeStyle = '#ff0000';
-    gctx.lineJoin = 'round';
-    gctx.lineWidth = STROKE_SIZE;
+	return result;
+    }
+
+    var personal = getButtonCanvas('personal', '#0000ff');
+    var group = getButtonCanvas('group', '#ff0000');
+    var prevPageBtn = getButtonCanvas('prevPage', '#ff0000');
+    var nextPageBtn = getButtonCanvas('nextPage', '#ff0000');
 
     function loadPage(fileName) {
 	result = new Image();
@@ -36,7 +37,9 @@ $(document).ready(function () {
     }
 
     function flipPages(pagesFlipped) {
-	pageIndex = Math.max(0, Math.min(pages.length - 1, pageIndex + pagesFlipped));
+	// The page index is the index of the LEFT page, so we can't actually flip to the
+	// LAST page, only the second-last.
+	pageIndex = Math.max(0, Math.min(pages.length - 2, pageIndex + pagesFlipped));
 	refreshPageDisplay();
     }
 
@@ -57,18 +60,36 @@ $(document).ready(function () {
 	return bgctx;
     }
 
-    function refreshPageDisplay() {
-	var bgctx = getBGctx();
+    function drawPage(pageImage, xCoordinate) {
+	var drawFunc = function () {
+	    getBGctx().drawImage(pageImage, xCoordinate, 0);
+	}
 
-	bgctx.drawImage(getLeftPage(), 0, 0);
-	bgctx.drawImage(getRightPage(), 700, 0);
+	if (pageImage.complete)
+	    drawFunc();
+	else
+	    pageImage.onload = drawFunc();
+    }
+
+    function refreshPageDisplay() {
+	drawPage(getLeftPage(), 0);
+	drawPage(getRightPage(), 700);
     }
 
     // for now, pages should have an even number of elements, since there is no support for drawing a "blank" when there is no right page.
     var pageIndex = 0;
     var pages = loadPages(["mus1.jpg", "mus2.jpg", "mus3.jpg", "mus4.jpg", "mus5.jpg", "mus6.jpg"]);
     refreshPageDisplay();
-    //    flipPages(1);
+
+    var prevPage = document.getElementById('prevPage');
+    prevPage.onclick = function () { flipPages(-2); };
+    $('#prevPage').css('left', 0);
+    $('#prevPage').css('top', HEIGHT - 100);
+
+    var nextPage = document.getElementById('nextPage');
+    nextPage.onclick = function () { flipPages(2); };
+    $('#nextPage').css('left', WIDTH - 100);
+    $('#nextPage').css('top', HEIGHT - 100);
 
     var perX = new Array();
     var perY = new Array();
@@ -80,6 +101,8 @@ $(document).ready(function () {
 
     var paint = false;
     
+    var pctx = personal.getContext('2d');
+    var gctx = group.getContext('2d');
     function getContext() {
         return (mode ? pctx : gctx);
     }

@@ -35,6 +35,40 @@
     z-index: 10;
 }
 
+#prevPage {
+    border: 2px solid black;
+    padding: 3px;
+    
+    text-align: center;
+    font-size: 40px;
+    color: white;
+    cursor: pointer;
+    
+    position: absolute;
+    top: 200px;
+    left: 20px;
+    height: 100px;
+    width: 100px;
+    z-index: 10;
+}
+
+#nextPage {
+    border: 2px solid black;
+    padding: 3px;
+    
+    text-align: center;
+    font-size: 40px;
+    color: white;
+    cursor: pointer;
+    
+    position: absolute;
+    top: 200px;
+    left: 200px;
+    height: 100px;
+    width: 100px;
+    z-index: 10;
+}
+
 .hidden {
     display: none;
 }
