@@ -1,156 +1,96 @@
 "use strict";
 
-$(document).ready(function () {
-    var STROKE_SIZE = 2;
-    var WIDTH = document.body.scrollWidth;
-    var HEIGHT = document.body.scrollHeight;
-    
-    var bg = document.getElementById('bg');
-    bg.width = WIDTH; 
-    bg.height = HEIGHT; 
+var WIDTH;
+var HEIGHT;
+var STROKE_SIZE = 2;
 
-    function initCanvas(canvasID, strokeStyle) {
-        result = document.getElementById(canvasID);
-        result.width = WIDTH - 11; 
-        result.height = HEIGHT - 11; 
-        var ctx = result.getContext('2d');
-        ctx.strokeStyle = strokeStyle;
-        ctx.lineJoin = 'round';
-        ctx.lineWidth = STROKE_SIZE;
-        return result;
-    }
+var pageFiles = ["mus1.jpg", "mus2.jpg",
+                 "mus3.jpg", "mus4.jpg",
+                 "mus5.jpg", "mus6.jpg"];
 
-    var personal = initCanvas('personal', '#0000ff');
-    var group = initCanvas('group', '#ff0000');
-    var prevPageBtn = initCanvas('prevPage', '#ff0000');
-    var nextPageBtn = initCanvas('nextPage', '#ff0000');
+// layers
+var personal;
+var perctx;
+var group;
+var grpctx;
+var bg;
+var bgctx;
 
-    function loadPage(fileName) {
-        result = new Image();
-        result.src = fileName;
-        return result;
-    }
+var erase = false;
+var paint = false;
+var edit = false;
 
-    function loadPages(fileNames) {
-        return fileNames.map(loadPage);
-    }
+function getContext() {
+    return (mode ? perctx : grpctx);
+}   
 
-    function flipPages(pagesFlipped) {
-        // The page index is the index of the LEFT page, so we can't actually flip to the
-        // LAST page, only the second-last.
-        pageIndex = Math.max(0, Math.min(pages.length - 2, pageIndex + pagesFlipped));
-        refreshPageDisplay();
-    }
+function clear(ctx) {
+    ctx.clearRect(0, 0, WIDTH-11, HEIGHT-11);
+}
 
-    // Returns the current left page.
-    function getLeftPage() {
-        return pages[pageIndex];
-    }
+function toggleEditMode() {
+    edit = !edit;
+    Control.updateControl();
+    redrawAll();
+    mode = true; 
+    erase = false;
+}
 
-    // Returns the current right page.
-    function getRightPage() {
-        return pages[pageIndex+1];
-    }
+function drawPoint(e, dragging) {
+    var mouseX = e.pageX; 
+    var mouseY = e.pageY;
 
-    function getBGctx() {
-        var bg = document.getElementById('bg');
-        var bgctx = bg.getContext('2d');
+    pages[pg].addClick(mouseX, mouseY, dragging);
+}
 
-        return bgctx;
-    }
+function redraw() {
+    var ctx = getContext();
+    clear(ctx);   
+ 
+    var page = pages[pg];
 
-    function drawPage(pageImage, xCoordinate) {
-        var drawFunc = function () {
-            getBGctx().drawImage(pageImage, xCoordinate, 0);
-        }
+    var X = page.getX();
+    var Y = page.getY();
+    var Drag = page.getDrag();
+    var Erase = page.getErase();
 
-        if (pageImage.complete) {
-            drawFunc();
+    for (var i = 0; i < X.length; i++) 
+    {
+        if (Erase[i]) {
+            ctx.clearRect(X[i], Y[i], 4*STROKE_SIZE, 4*STROKE_SIZE);
         } else {
-            pageImage.onload = drawFunc;
+            ctx.beginPath();
+            if (Drag[i] && i) {
+                ctx.moveTo(X[i-1], Y[i-1]);
+            } else {
+                ctx.moveTo(X[i] - 1, Y[i]);
+            }
+            ctx.lineTo(X[i], Y[i]);
+            ctx.stroke();
+            ctx.closePath();
         }
     }
+}
 
-    function refreshPageDisplay() {
-        drawPage(getLeftPage(), 0);
-        drawPage(getRightPage(), 700);
-    }
-
-    // for now, pages should have an even number of elements, since there is no support for drawing a "blank" when there is no right page.
-    var pageIndex = 0;
-    var pages = loadPages(["mus1.jpg", "mus2.jpg", "mus3.jpg", "mus4.jpg", "mus5.jpg", "mus6.jpg"]);
-    refreshPageDisplay();
-
-    var prevPage = document.getElementById('prevPage');
-    prevPage.onclick = function () { flipPages(-2); };
-    $('#prevPage').css('left', 0);
-    $('#prevPage').css('top', (HEIGHT - 11) - 100);
-
-    var nextPage = document.getElementById('nextPage');
-    nextPage.onclick = function () { flipPages(2); };
-    $('#nextPage').css('left', (WIDTH - 11) - 100);
-    $('#nextPage').css('top', (HEIGHT - 11) - 100);
-
-    var perX = new Array();
-    var perY = new Array();
-    var perDrag = new Array();
-    var perErase = new Array();
-
-    var grpX = new Array();
-    var grpY = new Array();
-    var grpDrag = new Array();
-    var grpErase = new Array();
-
-    var paint = false;
-    var erase = false;
-    
-    var pctx = personal.getContext('2d');
-    var gctx = group.getContext('2d');
-
-    function getContext() {
-        return (mode ? pctx : gctx);
-    }
-
-    function getX() {
-        return (mode ? perX : grpX);
-    }
-
-    function getY() {
-        return (mode ? perY : grpY);
-    }
-
-    function getDrag() {
-        return (mode ? perDrag : grpDrag);
-    }   
-    
-    function getErase() {
-        return (mode ? perErase: grpErase);
-    }
-
-    function addClick(x, y, dragging) {
-        var X = getX();
-        var Y = getY();
-        var Drag = getDrag();
-        var Erase = getErase();
-        X.push(x);
-        Y.push(y);
-        Drag.push(dragging);
-        Erase.push(erase);
-    }
-
-    function redraw() {
+function redrawBlack() {
+    var page = pages[pg];
+    var t = mode;
+    for (var m = 0; m < 2; m++) {
+        mode = m;
         var ctx = getContext();
-        ctx.width = ctx.width;
-    
-        var X = getX();
-        var Y = getY();
-        var Drag = getDrag();
-        var Erase = getErase();
+        var ss = ctx.strokeStyle;
+        ctx.strokeStyle = '#555';
+        
+        clear(ctx);
 
-        for (var i = 0; i < X.length; i++) 
-        {
+        var X = page.getX();
+        var Y = page.getY();
+        var Drag = page.getDrag();
+        var Erase = page.getErase();
+
+        for (var i = 0; i < X.length; i++) {
             if (Erase[i]) {
-                ctx.clearRect(X[i], Y[i], 4*STROKE_SIZE, 4*STROKE_SIZE);
+                ctx.clearRect(X[i], Y[i], 4*STROKE_SIZE, 4*STROKE_SIZE); 
             } else {
                 ctx.beginPath();
                 if (Drag[i] && i) {
@@ -162,114 +102,236 @@ $(document).ready(function () {
                 ctx.stroke();
                 ctx.closePath();
             }
-        }
+        }   
+        ctx.strokeStyle = ss;
     }
+    mode = t;
+}
 
-    function redrawBlack() {
+function redrawAll() {
+    if (edit) {
+        var t = mode;
         for (var m = 0; m < 2; m++) {
             mode = m;
-            var ctx = getContext();
-            var ss = ctx.strokeStyle;
-            ctx.strokeStyle = '#666';
-            
-            ctx.width = ctx.width;
-    
-            var X = getX();
-            var Y = getY();
-            var Drag = getDrag();
-            var Erase = getErase();
-
-            for (var i = 0; i < X.length; i++) {
-                if (Erase[i]) {
-                    ctx.clearRect(X[i], Y[i], 4*STROKE_SIZE, 4*STROKE_SIZE); 
-                } else {
-                    ctx.beginPath();
-                    if (Drag[i] && i) {
-                        ctx.moveTo(X[i-1], Y[i-1]);
-                    } else {
-                        ctx.moveTo(X[i] - 1, Y[i]);
-                    }
-                    ctx.lineTo(X[i], Y[i]);
-                    ctx.stroke();
-                    ctx.closePath();
-                }
-            }   
-            ctx.strokeStyle = ss;
+            redraw();
         }
-        mode = true;
-        
+        mode = t;
+    } else {
+        redrawBlack();
     }
+}
 
-    function drawPoint(e, dragging) {
-        var mouseX = e.pageX; 
-        var mouseY = e.pageY;
+// --- Page Object 
+function Page() {
+    this.leftImg = new Image();
+    this.rightImg = new Image();
 
-        addClick(mouseX, mouseY, dragging);
-        redraw();
-    }
+    // Personal Annotations
+    this.perX = new Array();
+    this.perY = new Array();
+    this.perDrag = new Array();
+    this.perErase = new Array();
 
-    function toggleEditMode() {
-        $('#control').toggleClass('hidden');
+    // Group Annotations
+    this.grpX = new Array();
+    this.grpY = new Array();
+    this.grpDrag = new Array();
+    this.grpErase = new Array();
 
-        if ($('#control').hasClass('hidden')) {
-            redrawBlack(); 
+    this.getX = function() {
+        return (mode ? this.perX : this.grpX);
+    };
+
+    this.getY = function() {
+        return (mode ? this.perY : this.grpY);
+    };
+
+    this.getDrag = function() {
+        return (mode ? this.perDrag : this.grpDrag);    
+    };
+
+    this.getErase = function() {
+        return (mode ? this.perErase : this.grpErase);
+    };
+
+    this.drawPage = function () {
+        this.drawPageDriver(this.leftImg, this.rightImg);
+        redrawAll();
+    };
+
+    this.drawPageDriver = function(left, right) {
+        var drawLeft = function() {
+            bgctx.drawImage(left, 0, 0);
+        };
+
+        var drawRight = function() {
+            bgctx.drawImage(right, 700, 0);
+        }
+
+        if (left.complete) {
+            drawLeft();
         } else {
-            mode = true;
-            redraw();
-            mode = false;
-            redraw();
+            left.onload = drawLeft; 
         }
-        mode = true; 
-        erase = false;
-        Control.updateControl();
+
+        if (right.complete) {
+            drawRight();
+        } else {
+            right.onload = drawRight; 
+        }
+    };
+
+    this.addClick = function(x, y, drag) {
+        this.getX().push(x);
+        this.getY().push(y);
+        this.getDrag().push(drag);
+        this.getErase().push(erase);
+
+        redraw();
+    };
+}
+// ---
+
+var pg = 0; // index
+var npg = 3;
+var pages = [new Page(), new Page(), new Page()];
+
+function flipForward() {
+    if (pg < (npg - 1)) {
+        pg++;
+        pages[pg].drawPage();
     }
+}
 
-    // Handlers for the 'personal' layer
-    $('#personal').mousedown(function(e) {
-        paint = true;
-        drawPoint(e);
-    });
-    
-    $('#personal').mousemove(function(e) {
-        if (paint) {
-            drawPoint(e, true);
+function flipBackward() {
+    if (pg > 0) {
+        pg--;
+        pages[pg].drawPage();
+    }
+}
+
+// ---
+
+(function() {
+    var Startup = window.Startup = {
+        preload: function() {
+            // Set the images for each page
+            for (var i = 0; i < pages.length; i++) {
+                pages[i].leftImg.src = pageFiles[i*2];
+                pages[i].rightImg.src = pageFiles[i*2 + 1]; 
+            }
+        },
+
+        init: function() {
+            var setCanvas = function(can, ctx, style) {
+                can.height = HEIGHT - 11;
+                can.width = WIDTH - 11;
+                
+                ctx.strokeStyle = style;
+                ctx.lineJoin = 'round';
+                ctx.lineWidth = STROKE_SIZE; 
+
+            }
+            
+            var setBgCanvas = function() {
+                bg.height = HEIGHT;
+                bg.width = WIDTH;
+            }
+
+            WIDTH = document.body.scrollWidth;
+            HEIGHT = document.body.scrollHeight;
+
+            personal = $('#personal')[0];
+            group = $('#group')[0];
+            bg = $('#bg')[0] 
+           
+            perctx = personal.getContext('2d'); 
+            setCanvas(personal, perctx, '#0000ff');
+            grpctx = group.getContext('2d');
+            setCanvas(group, grpctx, '#ff0000');
+            bgctx = bg.getContext('2d');
+            setBgCanvas();
+
+            pages[0].drawPage();
+
+            // Position the page flipping buttons
+            $('#prevPage').css('left', 0);
+            $('#prevPage').css('top', HEIGHT - 11 - 100);
+            $('#nextPage').css('left', WIDTH - 11 - 100);
+            $('#nextPage').css('top', HEIGHT - 11 - 100);
+        
+            Startup.initHandlers();
+        },
+
+        initHandlers: function() {
+            $('#prevPage').click(function() {
+                flipBackward(); 
+            }); 
+            
+            $('#nextPage').click(function() {
+                flipForward();
+            });
+           
+            // Handlers for the 'personal' layer
+            $('#personal').mousedown(function(e) {
+                if (edit) { 
+                    paint = true;
+                    drawPoint(e);
+                }
+            });
+            
+            $('#personal').mousemove(function(e) {
+                if (paint) {
+                    drawPoint(e, true);
+                }
+            });
+
+            $('#personal').mouseup(function(e) {
+                paint = false;
+            });
+
+            $('#personal').mouseleave(function(e) {
+                paint = false;
+            });
+
+            // Handlers for the 'group' layer
+            $('#group').mousedown(function(e) {
+                if (edit) { 
+                    paint = true;
+                    drawPoint(e);
+                }
+            });
+
+            $('#group').mousemove(function(e) {
+                if (paint) {
+                    drawPoint(e, true);
+                }
+            });
+
+            $('#group').mouseup(function(e) {
+                paint = false;
+            });
+
+            $('#group').mouseleave(function(e) {
+                paint = false;
+            }); 
+            
+            // Ghetto WOZ handlers 
+            $(document).keypress(function(e) {
+                if (e.keyCode == 13) {
+                    toggleEditMode();
+                } else if (e.keyCode == 101 || e.which == 101) {
+                    erase = !erase;
+                }
+            });
         }
-    });
+    };
+})();
 
-    $('#personal').mouseup(function(e) {
-        paint = false;
-    });
 
-    $('#personal').mouseleave(function(e) {
-        paint = false;
-    });
+// Load the images ASAP
+Startup.preload();
 
-    // Handlers for the 'group' layer
-    $('#group').mousedown(function(e) {
-        paint = true;
-        drawPoint(e);
-    });
-
-    $('#group').mousemove(function(e) {
-        if (paint) {
-            drawPoint(e, true);
-        }
-    });
-
-    $('#group').mouseup(function(e) {
-        paint = false;
-    });
-
-    $('#group').mouseleave(function(e) {
-        paint = false;
-    }); 
-
-    // Ghetto WOZ handlers
-    $(document).keypress(function(e) {
-        if (e.keyCode == 13) {
-            toggleEditMode();
-        } else if (e.keyCode == 101) {
-            erase = !erase;
-        }
-    });
+$(document).ready(function () {
+    Startup.init();
 });

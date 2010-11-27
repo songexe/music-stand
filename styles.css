@@ -5,14 +5,12 @@
 }
 
 #personal {
-    border: 1px solid black;
     position: absolute;
     top: 0;
     left: 0;
 }
 
 #group {
-    border: 1px solid black;
     position: absolute;
     top: 0;
     left: 0;
@@ -35,38 +33,13 @@
     z-index: 10;
 }
 
-#prevPage {
+.pageButton {
     border: 2px solid black;
-    padding: 3px;
-    
-    text-align: center;
-    font-size: 40px;
-    color: white;
     cursor: pointer;
-    
     position: absolute;
-    top: 200px;
-    left: 20px;
+    z-index: 10;
     height: 100px;
     width: 100px;
-    z-index: 10;
-}
-
-#nextPage {
-    border: 2px solid black;
-    padding: 3px;
-    
-    text-align: center;
-    font-size: 40px;
-    color: white;
-    cursor: pointer;
-    
-    position: absolute;
-    top: 200px;
-    left: 200px;
-    height: 100px;
-    width: 100px;
-    z-index: 10;
 }
 
 .hidden {

@@ -1,16 +1,20 @@
 (function() {
     var Control = window.Control = {
         updateControl: function() {
-            var color = (mode ? 'blue' : 'red');
-            var txt = (mode ? 'Personal' : 'Group');
-            var perindex = (mode ? 1 : 0);
-            var grpindex = (mode ? 0 : 1);
-            
-            $('#control').css('background-color', color);
-            $('#control').text(txt);
-            
-            $('#group').css('z-index', grpindex);
-            $('#personal').css('z-index', perindex);
+            if (edit) {
+                var color = (mode ? 'blue' : 'red');
+                var perindex = (mode ? 1 : 0);
+                var grpindex = (mode ? 0 : 1);
+                
+                $('#control').css('background-color', color);
+                
+                $('#group').css('z-index', grpindex);
+                $('#personal').css('z-index', perindex);
+                
+                $('#control').removeClass('hidden');
+            } else {
+                $('#control').addClass('hidden');
+            }
         },
 
         resetMode: function() {
@@ -24,7 +28,6 @@
             Control.updateControl();
         },
 
-    
         init: function() {
             $('#control').click(function () {
                 Control.toggleMode();
