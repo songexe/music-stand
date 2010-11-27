@@ -134,7 +134,7 @@ $(document).ready(function () {
             redraw();
         }
         mode = true; 
-        updateControl();
+        Control.updateControl();
     }
 
     // Handlers for the 'personal' layer
