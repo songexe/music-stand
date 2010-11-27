@@ -4,7 +4,7 @@ $(document).ready(function () {
     var STROKE_SIZE = 2;
     var WIDTH = document.body.scrollWidth;
     var HEIGHT = document.body.scrollHeight;
-
+    
     var bg = document.getElementById('bg');
     bg.width = WIDTH; 
     bg.height = HEIGHT; 
@@ -67,7 +67,7 @@ $(document).ready(function () {
         if (pageImage.complete) {
             drawFunc();
         } else {
-            pageImage.onload = drawFunc();
+            pageImage.onload = drawFunc;
         }
     }
 
@@ -84,12 +84,12 @@ $(document).ready(function () {
     var prevPage = document.getElementById('prevPage');
     prevPage.onclick = function () { flipPages(-2); };
     $('#prevPage').css('left', 0);
-    $('#prevPage').css('top', HEIGHT - 100);
+    $('#prevPage').css('top', (HEIGHT - 11) - 100);
 
     var nextPage = document.getElementById('nextPage');
     nextPage.onclick = function () { flipPages(2); };
-    $('#nextPage').css('left', WIDTH - 100);
-    $('#nextPage').css('top', HEIGHT - 100);
+    $('#nextPage').css('left', (WIDTH - 11) - 100);
+    $('#nextPage').css('top', (HEIGHT - 11) - 100);
 
     var perX = new Array();
     var perY = new Array();
