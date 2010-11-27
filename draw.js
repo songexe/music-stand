@@ -8,17 +8,6 @@ $(document).ready(function () {
     var bg = document.getElementById('bg');
     bg.width = WIDTH; 
     bg.height = HEIGHT; 
-    var bgctx = bg.getContext('2d');
-    var left = new Image();
-    var right = new Image();
-    left.src = "mus1.jpg";
-    right.src = "mus2.jpg";
-    left.onload = function () {
-        bgctx.drawImage(left, 0, 0);
-    }; 
-    right.onload = function() {
-        bgctx.drawImage(right, 700, 0);
-    };
 
     var personal = document.getElementById('personal');
     personal.width = WIDTH - 11; 
@@ -35,6 +24,51 @@ $(document).ready(function () {
     gctx.strokeStyle = '#ff0000';
     gctx.lineJoin = 'round';
     gctx.lineWidth = STROKE_SIZE;
+
+    function loadPage(fileName) {
+	result = new Image();
+	result.src = fileName;
+	return result;
+    }
+
+    function loadPages(fileNames) {
+	return fileNames.map(loadPage);
+    }
+
+    function flipPages(pagesFlipped) {
+	pageIndex = Math.max(0, Math.min(pages.length - 1, pageIndex + pagesFlipped));
+	refreshPageDisplay();
+    }
+
+    // Returns the current left page.
+    function getLeftPage() {
+	return pages[pageIndex];
+    }
+
+    // Returns the current right page.
+    function getRightPage() {
+	return pages[pageIndex+1];
+    }
+
+    function getBGctx() {
+	var bg = document.getElementById('bg');
+	var bgctx = bg.getContext('2d');
+
+	return bgctx;
+    }
+
+    function refreshPageDisplay() {
+	var bgctx = getBGctx();
+
+	bgctx.drawImage(getLeftPage(), 0, 0);
+	bgctx.drawImage(getRightPage(), 700, 0);
+    }
+
+    // for now, pages should have an even number of elements, since there is no support for drawing a "blank" when there is no right page.
+    var pageIndex = 0;
+    var pages = loadPages(["mus1.jpg", "mus2.jpg", "mus3.jpg", "mus4.jpg", "mus5.jpg", "mus6.jpg"]);
+    refreshPageDisplay();
+    //    flipPages(1);
 
     var perX = new Array();
     var perY = new Array();
