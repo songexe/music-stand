@@ -1,28 +1,36 @@
+"use strict";
+
 $(document).ready(function () {
-    "use strict";
     var STROKE_SIZE = 2;
+    var WIDTH = document.body.scrollWidth;
+    var HEIGHT = document.body.scrollHeight;
 
     var bg = document.getElementById('bg');
-    bg.width = document.width;
-    bg.height = document.height;
+    bg.width = WIDTH; 
+    bg.height = HEIGHT; 
     var bgctx = bg.getContext('2d');
-    var mus = new Image();
-    mus.src = "http://mathisregazziblogs.com/wp-content/uploads/2010/09/sheet_music.jpg";
-    mus.onload = function () {
-        bgctx.drawImage(mus, 0, 0);
+    var left = new Image();
+    var right = new Image();
+    left.src = "mus1.jpg";
+    right.src = "mus2.jpg";
+    left.onload = function () {
+        bgctx.drawImage(left, 0, 0);
     }; 
+    right.onload = function() {
+        bgctx.drawImage(right, 700, 0);
+    };
 
     var personal = document.getElementById('personal');
-    personal.width = document.width - 11;
-    personal.height = document.height - 11;
+    personal.width = WIDTH - 11; 
+    personal.height = HEIGHT - 11; 
     var pctx = personal.getContext('2d');
     pctx.strokeStyle = '#0000ff';
     pctx.lineJoin = 'round';
     pctx.lineWidth = STROKE_SIZE;
 
     var group = document.getElementById('group');
-    group.width = document.width - 11;
-    group.height = document.height - 11;
+    group.width = WIDTH - 11;
+    group.height = HEIGHT - 11;
     var gctx = group.getContext('2d');
     gctx.strokeStyle = '#ff0000';
     gctx.lineJoin = 'round';
@@ -55,21 +63,21 @@ $(document).ready(function () {
     }   
 
     function addClick(x, y, dragging) {
-        X = getX();
-        Y = getY();
-        Drag = getDrag();
+        var X = getX();
+        var Y = getY();
+        var Drag = getDrag();
         X.push(x);
         Y.push(y);
         Drag.push(dragging);
     }
 
     function redraw() {
-        ctx = getContext();
+        var ctx = getContext();
         ctx.width = ctx.width;
     
-        X = getX();
-        Y = getY();
-        Drag = getDrag();
+        var X = getX();
+        var Y = getY();
+        var Drag = getDrag();
 
         for (var i = 0; i < X.length; i++) 
         {
@@ -88,15 +96,15 @@ $(document).ready(function () {
     function redrawBlack() {
         for (var m = 0; m < 2; m++) {
             mode = m;
-            ctx = getContext();
-            ss = ctx.strokeStyle;
-            ctx.strokeStyle = '#888';
+            var ctx = getContext();
+            var ss = ctx.strokeStyle;
+            ctx.strokeStyle = '#666';
             
             ctx.width = ctx.width;
     
-            X = getX();
-            Y = getY();
-            Drag = getDrag();
+            var X = getX();
+            var Y = getY();
+            var Drag = getDrag();
 
             for (var i = 0; i < X.length; i++) {
                 ctx.beginPath();
@@ -112,6 +120,7 @@ $(document).ready(function () {
             ctx.strokeStyle = ss;
         }
         mode = true;
+        
     }
 
     function drawPoint(e, dragging) {
