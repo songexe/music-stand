@@ -9,7 +9,7 @@ $(document).ready(function () {
     bg.width = WIDTH; 
     bg.height = HEIGHT; 
 
-    function getButtonCanvas(canvasID, strokeStyle) {
+    function initCanvas(canvasID, strokeStyle) {
         result = document.getElementById(canvasID);
         result.width = WIDTH - 11; 
         result.height = HEIGHT - 11; 
@@ -20,10 +20,10 @@ $(document).ready(function () {
         return result;
     }
 
-    var personal = getButtonCanvas('personal', '#0000ff');
-    var group = getButtonCanvas('group', '#ff0000');
-    var prevPageBtn = getButtonCanvas('prevPage', '#ff0000');
-    var nextPageBtn = getButtonCanvas('nextPage', '#ff0000');
+    var personal = initCanvas('personal', '#0000ff');
+    var group = initCanvas('group', '#ff0000');
+    var prevPageBtn = initCanvas('prevPage', '#ff0000');
+    var nextPageBtn = initCanvas('nextPage', '#ff0000');
 
     function loadPage(fileName) {
         result = new Image();
