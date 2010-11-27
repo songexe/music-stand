@@ -94,7 +94,7 @@ $(document).ready(function () {
     var perX = new Array();
     var perY = new Array();
     var perDrag = new Array();
-    var perDrag = new Array();
+    var perErase = new Array();
 
     var grpX = new Array();
     var grpY = new Array();
@@ -122,14 +122,20 @@ $(document).ready(function () {
     function getDrag() {
         return (mode ? perDrag : grpDrag);
     }   
+    
+    function getErase() {
+        return (mode ? perErase: grpErase);
+    }
 
     function addClick(x, y, dragging) {
         var X = getX();
         var Y = getY();
         var Drag = getDrag();
+        var Erase = getErase();
         X.push(x);
         Y.push(y);
         Drag.push(dragging);
+        Erase.push(erase);
     }
 
     function redraw() {
@@ -139,18 +145,23 @@ $(document).ready(function () {
         var X = getX();
         var Y = getY();
         var Drag = getDrag();
+        var Erase = getErase();
 
         for (var i = 0; i < X.length; i++) 
         {
-            ctx.beginPath();
-            if (Drag[i] && i) {
-                ctx.moveTo(X[i-1], Y[i-1]);
+            if (Erase[i]) {
+                ctx.clearRect(X[i], Y[i], 4*STROKE_SIZE, 4*STROKE_SIZE);
             } else {
-                ctx.moveTo(X[i] - 1, Y[i]);
+                ctx.beginPath();
+                if (Drag[i] && i) {
+                    ctx.moveTo(X[i-1], Y[i-1]);
+                } else {
+                    ctx.moveTo(X[i] - 1, Y[i]);
+                }
+                ctx.lineTo(X[i], Y[i]);
+                ctx.stroke();
+                ctx.closePath();
             }
-            ctx.lineTo(X[i], Y[i]);
-            ctx.stroke();
-            ctx.closePath();
         }
     }
 
@@ -168,15 +179,19 @@ $(document).ready(function () {
             var Drag = getDrag();
 
             for (var i = 0; i < X.length; i++) {
-                ctx.beginPath();
-                if (Drag[i] && i) {
-                    ctx.moveTo(X[i-1], Y[i-1]);
+                if (Erase[i]) {
+                    ctx.clearRect(X[i], Y[i], 4*STROKE_SIZE, 4*STROKE_SIZE); 
                 } else {
-                    ctx.moveTo(X[i] - 1, Y[i]);
+                    ctx.beginPath();
+                    if (Drag[i] && i) {
+                        ctx.moveTo(X[i-1], Y[i-1]);
+                    } else {
+                        ctx.moveTo(X[i] - 1, Y[i]);
+                    }
+                    ctx.lineTo(X[i], Y[i]);
+                    ctx.stroke();
+                    ctx.closePath();
                 }
-                ctx.lineTo(X[i], Y[i]);
-                ctx.stroke();
-                ctx.closePath();
             }   
             ctx.strokeStyle = ss;
         }
@@ -204,6 +219,7 @@ $(document).ready(function () {
             redraw();
         }
         mode = true; 
+        erase = false;
         Control.updateControl();
     }
 
@@ -249,8 +265,12 @@ $(document).ready(function () {
 
     // Ghetto WOZ handlers
     $(document).keypress(function(e) {
+        alert("!");
         if (e.keyCode == 13) {
             toggleEditMode();
+        } else if (e.keyCode == 69) {
+            erase = !erase;
+            alert(erase);
         }
     });
 });
