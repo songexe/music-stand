@@ -1,0 +1,2 @@
+Options +ExecCGI
+AddHandler fcgid-script py
