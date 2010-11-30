@@ -186,7 +186,6 @@ function Page() {
         this.getY().push(y);
         this.getDrag().push(drag);
         this.getErase().push(erase);
-
         redraw();
     };
 }
@@ -276,7 +275,7 @@ function flipBackward() {
             $('#personal').mousedown(function(e) {
                 if (edit) { 
                     paint = true;
-                    drawPoint(e);
+                    drawPoint(e, false);
                 }
             });
             
@@ -298,7 +297,7 @@ function flipBackward() {
             $('#group').mousedown(function(e) {
                 if (edit) { 
                     paint = true;
-                    drawPoint(e);
+                    drawPoint(e, false);
                 }
             });
 
@@ -309,6 +308,16 @@ function flipBackward() {
             });
 
             $('#group').mouseup(function(e) {
+                dat = { 'pg': pg,
+                        'x': pages[pg].grpX,
+                        'y': pages[pg].grpY,
+                        'drag': pages[pg].grpDrag,
+                        'erase': pages[pg].grpErase };
+                $.ajax({
+                    url: 'cgi-bin/put.py',
+                    type: 'POST', 
+                    data: { 'dat': $.toJSON(dat) }
+                });
                 paint = false;
             });
 
@@ -334,4 +343,21 @@ Startup.preload();
 
 $(document).ready(function () {
     Startup.init();
+
+    setInterval(function() {
+        $.ajax({
+            url: 'cgi-bin/take.py',
+            type: 'GET',
+            data: { 'pg' : pg },
+            dataType: 'json',
+            success: function(data) {
+                pages[pg].grpX = data['x'];
+                pages[pg].grpY = data['y'];
+                pages[pg].grpDrag = data['drag'];
+                pages[pg].grpErase = data['erase'];
+                redrawAll();
+            }
+        });
+        return false;
+    }, 5000);
 });
