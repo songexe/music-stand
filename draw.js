@@ -57,7 +57,7 @@ function redraw() {
     for (var i = 0; i < X.length; i++) 
     {
         if (Erase[i]) {
-            ctx.clearRect(X[i], Y[i], 4*STROKE_SIZE, 4*STROKE_SIZE);
+            ctx.clearRect(X[i], Y[i], 6*STROKE_SIZE, 6*STROKE_SIZE);
         } else {
             ctx.beginPath();
             if (Drag[i] && i) {
@@ -255,9 +255,9 @@ function flipBackward() {
 
             // Position the page flipping buttons
             $('#prevPage').css('left', 0);
-            $('#prevPage').css('top', HEIGHT - 11 - 100);
+            $('#prevPage').css('top', HEIGHT - 11 - 60);
             $('#nextPage').css('left', WIDTH - 11 - 100);
-            $('#nextPage').css('top', HEIGHT - 11 - 100);
+            $('#nextPage').css('top', HEIGHT - 11 - 60);
         
             Startup.initHandlers();
         },
@@ -329,8 +329,11 @@ function flipBackward() {
             $(document).keypress(function(e) {
                 if (e.keyCode == 13) {
                     toggleEditMode();
-                } else if (e.keyCode == 101 || e.which == 101) {
+                } else if (e.which == 101) {
                     erase = !erase;
+                } else if (e.which == 102) {
+                    $('#bar').effect('highlight', 
+                        {'color':'#00ff00'}, 500);
                 }
             });
         }
@@ -341,7 +344,7 @@ function flipBackward() {
 // Load the images ASAP
 Startup.preload();
 
-$(document).ready(function () {
+function begin() {
     Startup.init();
 
     setInterval(function() {
@@ -360,4 +363,14 @@ $(document).ready(function () {
         });
         return false;
     }, 5000);
+
+    $('.pageButton').show();
+};
+
+
+$(document).ready(function () {
+    $('#piece').click(function () {
+        $('#lib').fadeOut(1000);
+        setTimeout('begin()', 1000);
+    });
 });

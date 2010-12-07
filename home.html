@@ -6,6 +6,7 @@
         var mode = true;
     </script>
     <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.js"></script>
+    <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8/jquery-ui.min.js"></script>
     <script type="text/javascript" src="json2.js"></script>
     <script type="text/javascript" src="control.js"></script>
     <script type="text/javascript" src="draw.js"></script>
@@ -14,7 +15,25 @@
 </style>
 
 <body>
-    <div id="control">
+    <div id="lib">
+        <h3>Next Concert</h3>
+        <div>
+            <div>Schubert: Symphony No. 5 in Bb Major</div>
+            <div id="piece">Haydn: Quartet No. 58 in G Minor</div>
+            <div>Mendelssohn: Violin Concerto in E Minor</div>
+        </div>
+        <h3>Other Music</h3>
+        <div>
+            <div>Tchaikovsky: Symphony No. 1 in G Minor</div>
+            <div>Mozart: Overture to The Magic Flute</div>
+            <div>Glinka: Russlan and Ludmilla Overture</div>
+        </div>
+    </div>
+
+    <div id="control" class="hidden">
+        Personal
+    </div>
+    <div id="bar">
     </div>
     
     <canvas id="bg">
@@ -29,8 +48,10 @@
     </canvas>
    
     <div id="nextPage" class="pageButton">
+        -->
     </div>
     <div id="prevPage" class="pageButton">
+        <--
     </div>
 
 </body>

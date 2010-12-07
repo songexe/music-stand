@@ -3,6 +3,7 @@
         updateControl: function() {
             if (edit) {
                 var color = (mode ? 'blue' : 'red');
+                var txt = (mode ? 'Personal' : 'Group');
                 var perindex = (mode ? 1 : 0);
                 var grpindex = (mode ? 0 : 1);
                 
@@ -12,6 +13,7 @@
                 $('#personal').css('z-index', perindex);
                 
                 $('#control').removeClass('hidden');
+                $('#control').text(txt);
             } else {
                 $('#control').addClass('hidden');
             }
@@ -34,6 +36,8 @@
             });
 
             Control.updateControl();
+
+            $('#lib').accordion();
         }
     };
 })();
